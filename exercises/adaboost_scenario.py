@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Tuple
-from IMLearn.learners.metalearners.adaboost import AdaBoost
+from IMLearn.metalearners.adaboost import AdaBoost
 from IMLearn.learners.classifiers import DecisionStump
 from utils import *
 import plotly.graph_objects as go
@@ -58,4 +58,8 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
 
 if __name__ == '__main__':
     np.random.seed(0)
-    raise NotImplementedError()
+    a = np.array([1, 2, 3, 4, 2, 1, 2, 3, 5, 6]).reshape(10, 1)
+    y = np.array([-1 if i < 3 else 1 for i in a])
+    s = DecisionStump()
+    s.fit(a, y)
+    print(s.predict(a))
