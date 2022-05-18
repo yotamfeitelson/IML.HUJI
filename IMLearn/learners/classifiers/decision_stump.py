@@ -105,16 +105,16 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
-        values_labels = np.vstack((values, labels)).T
+        values_labels = np.vstack((values, labels)).T  # [[value_1, label_1], [value_2, label_2], ...]
         # Find the best threshold by minimizing the misclassification error
         thresholds = np.unique(values_labels[:, 0])
         errors = np.zeros(len(thresholds))
         for i, threshold in enumerate(thresholds):
-            new_labels = values_labels
-            new_labels[new_labels[:, 0] >= threshold, 1] = sign
-            new_labels[new_labels[:, 0] < threshold, 1] = -sign
-            errors[i] = np.sum(new_labels[:, 1] != labels)
-        return thresholds[np.argmin(errors)], np.min(errors)
+            new_value_labels = values_labels
+            new_value_labels[new_value_labels[:, 0] >= threshold, 1] = sign
+            new_value_labels[new_value_labels[:, 0] < threshold, 1] = -sign
+            errors[i] = np.sum(np.abs(labels[new_value_labels[:, 1] != np.sign(labels)]))  # weighted misclassification error
+        return thresholds[np.argmin(errors)], np.min(errors)/len(labels)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -135,7 +135,7 @@ class DecisionStump(BaseEstimator):
         """
         return misclassification_error(self.predict(X), y)
 
-#
+
 # if __name__ == "__main__":
 #     a = np.array([1, 2, 3, 4, 2, 1, 2, 3, 5, 6]).reshape(10, 1)
 #     y = np.array([-1 if i < 3 else 1 for i in a])
